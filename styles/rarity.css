@@ -1,0 +1,134 @@
+/* ── Stuffie card base — no box, just the animal and a glow ── */
+.stuffie-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 12px 8px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  transition: transform 0.2s;
+  cursor: pointer;
+  min-width: 90px;
+}
+.stuffie-card:active { transform: scale(0.96); }
+
+@keyframes stuffiePop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.35) rotate(-8deg); }
+  50%  { transform: scale(1.25) rotate(6deg); }
+  70%  { transform: scale(1.1) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.stuffie-bounce { animation: stuffiePop 0.45s ease-out; }
+
+/* ── Common — subtle warm glow ── */
+.stuffie-card.common .stuffie-emoji {
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+}
+
+/* ── Uncommon — green glow ── */
+.stuffie-card.uncommon .stuffie-emoji {
+  filter: drop-shadow(0 0 8px rgba(76,175,80,0.8));
+}
+
+/* ── Rare — blue glow ── */
+.stuffie-card.rare .stuffie-emoji {
+  filter: drop-shadow(0 0 10px rgba(33,150,243,0.9));
+}
+
+/* ── Epic — purple glow + gentle bob ── */
+.stuffie-card.epic .stuffie-emoji {
+  filter: drop-shadow(0 0 12px rgba(156,39,176,0.9));
+}
+.stuffie-card.epic {
+  animation: epicBob 2.4s ease-in-out infinite;
+}
+@keyframes epicBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+/* ── Legendary — gold pulsing glow + spin star ── */
+.stuffie-card.legendary .stuffie-emoji {
+  animation: legendaryGlow 1.8s ease-in-out infinite;
+}
+@keyframes legendaryGlow {
+  0%,100% { filter: drop-shadow(0 0 10px rgba(255,152,0,0.7)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(255,210,0,1)); }
+}
+.stuffie-card.legendary::after {
+  content: '✨';
+  position: absolute;
+  top: -10px; right: -10px;
+  font-size: 1.1rem;
+  animation: spin 3s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Mythic — rainbow hue-rotate glow + float ── */
+.stuffie-card.mythic .stuffie-emoji {
+  animation: mythicGlow 2.5s linear infinite, mythicFloat 2s ease-in-out infinite;
+}
+@keyframes mythicGlow {
+  0%   { filter: drop-shadow(0 0 14px #ff0080); }
+  17%  { filter: drop-shadow(0 0 14px #ff8c00); }
+  33%  { filter: drop-shadow(0 0 14px #ffe100); }
+  50%  { filter: drop-shadow(0 0 14px #00e5ff); }
+  67%  { filter: drop-shadow(0 0 14px #7b00ff); }
+  83%  { filter: drop-shadow(0 0 14px #ff0080); }
+  100% { filter: drop-shadow(0 0 14px #ff0080); }
+}
+@keyframes mythicFloat {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-6px) scale(1.04); }
+}
+.stuffie-card.mythic::before {
+  content: '🌟';
+  position: absolute;
+  top: -12px; left: -10px;
+  font-size: 1.2rem;
+  animation: mythicStar 1.5s ease-in-out infinite alternate;
+}
+.stuffie-card.mythic::after {
+  content: '🌟';
+  position: absolute;
+  bottom: -12px; right: -10px;
+  font-size: 1.2rem;
+  animation: mythicStar 1.5s ease-in-out infinite alternate-reverse;
+}
+@keyframes mythicStar {
+  from { transform: scale(0.8) rotate(-15deg); }
+  to   { transform: scale(1.2) rotate(15deg); }
+}
+
+/* ── Large card (bag reveal) ── */
+.stuffie-card--large {
+  padding: 24px 20px;
+  min-width: 160px;
+}
+.stuffie-card--large .stuffie-emoji { font-size: 5rem; }
+.stuffie-card--large .stuffie-name  { font-size: 1.2rem; margin-top: 8px; }
+
+/* ── Small card (family collection columns) ── */
+.stuffie-card--small {
+  padding: 6px 4px;
+  min-width: unset;
+  border-radius: 10px;
+}
+.stuffie-card--small .stuffie-emoji  { font-size: 1.6rem; }
+.stuffie-card--small .stuffie-name   { font-size: 0.55rem; margin-top: 3px; }
+.stuffie-card--small .stuffie-rarity { display: none; }
+
+/* ── Rarity label colors ── */
+.stuffie-emoji  { font-size: 2.8rem; line-height: 1; display: block; }
+.stuffie-name   { font-size: 0.72rem; font-weight: 600; color: var(--text); margin-top: 6px; line-height: 1.2; }
+.stuffie-rarity { font-size: 0.65rem; font-weight: 600; margin-top: 3px; }
+
+.rarity-common    { color: #888; }
+.rarity-uncommon  { color: #388e3c; }
+.rarity-rare      { color: #1565c0; }
+.rarity-epic      { color: #6a1b9a; }
+.rarity-legendary { color: #e65100; font-weight: 700; }
+.rarity-mythic    { background: linear-gradient(90deg,#ff0080,#ff8c00,#ffe100,#00e5ff,#7b00ff);
+                    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                    background-clip: text; font-weight: 700; }

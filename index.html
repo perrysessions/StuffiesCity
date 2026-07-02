@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Stuffie City</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/rarity.css">
+</head>
+<body>
+  <div id="app">
+    <header id="top-bar" class="hidden">
+      <div id="coin-display">🪙 <span id="coin-count">0</span></div>
+      <button id="switch-btn">Switch</button>
+      <div id="user-display"></div>
+      <button id="logout-btn">Sign Out</button>
+    </header>
+
+    <main id="view">
+      <div class="center-msg">Loading Stuffie City… 🌟</div>
+    </main>
+
+    <nav id="bottom-nav" class="hidden">
+      <a href="#home"       class="nav-btn"><span>🏠</span><span>Home</span></a>
+      <a href="#games"      class="nav-btn"><span>🎮</span><span>Learn</span></a>
+      <a href="#shop"       class="nav-btn"><span>🛍️</span><span>Shop</span></a>
+      <a href="#collection" class="nav-btn"><span>🎒</span><span>Collection</span></a>
+    </nav>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-box"></div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
