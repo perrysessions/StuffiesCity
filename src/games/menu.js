@@ -37,6 +37,15 @@ export function renderGamesMenu() {
         <div class="game-coins">🪙 +5/correct</div>
       </a>
 
+      <a href="#game/geography" class="game-card">
+        <div class="game-icon">🗺️</div>
+        <div class="game-info">
+          <div class="game-title">Geography</div>
+          <div class="game-desc">Find states on the US map</div>
+        </div>
+        <div class="game-coins">🪙 +5/correct</div>
+      </a>
+
       <div class="games-hint">Answer correctly to build a streak bonus! ⭐</div>
     </div>
   `);

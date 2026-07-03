@@ -397,3 +397,35 @@ html, body {
   .profile-picker-grid { grid-template-columns: repeat(3,1fr); }
   .family-col-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ── Geography game ── */
+.geo-screen { padding-bottom: 0; }
+.geo-prompt { font-size: 1.1rem; font-weight: 700; text-align: center; margin: 8px 0 10px; color: var(--text); }
+.geo-prompt strong { color: var(--purple); }
+
+.geo-map-wrap { width: 100%; overflow: hidden; border-radius: 12px; background: #e8f4fd; border: 2px solid var(--border); }
+.geo-map { width: 100%; height: auto; display: block; }
+
+.geo-state {
+  fill: #c8dff7; stroke: #fff; stroke-width: 1.5;
+  cursor: pointer; transition: fill 0.15s;
+}
+.geo-state:hover { fill: #a0c8f0; }
+.geo-state--highlight { fill: #f472b6; stroke: #be185d; stroke-width: 2; }
+.geo-state--correct   { fill: #4ade80; stroke: #16a34a; stroke-width: 2; }
+.geo-state--wrong     { fill: #f87171; stroke: #dc2626; stroke-width: 2; }
+
+.geo-abbr {
+  font-size: 9px; font-weight: 700; fill: #1e3a5f;
+  text-anchor: middle; dominant-baseline: middle;
+  font-family: system-ui, sans-serif;
+}
+.geo-inset-label {
+  font-size: 10px; fill: #666; text-anchor: middle;
+  font-family: system-ui, sans-serif;
+}
+
+.geo-hint { min-height: 28px; text-align: center; font-size: 0.95rem; font-weight: 600;
+            margin-top: 8px; color: var(--text); }
+
+.choices-grid--2col { grid-template-columns: 1fr 1fr !important; }

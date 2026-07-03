@@ -50,6 +50,10 @@ async function boot() {
     const { renderReading } = await import('./games/reading.js');
     renderReading();
   });
+  registerRoute('#game/geography', async () => {
+    const { renderGeography } = await import('./games/geography.js');
+    renderGeography();
+  });
   registerRoute('#shop', async () => {
     const { renderShop } = await import('./shop.js');
     renderShop();
