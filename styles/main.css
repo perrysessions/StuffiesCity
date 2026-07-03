@@ -403,29 +403,33 @@ html, body {
 .geo-prompt { font-size: 1.1rem; font-weight: 700; text-align: center; margin: 8px 0 10px; color: var(--text); }
 .geo-prompt strong { color: var(--purple); }
 
-.geo-map-wrap { width: 100%; overflow: hidden; border-radius: 12px; background: #e8f4fd; border: 2px solid var(--border); }
+.geo-map-wrap { width: 100%; overflow: hidden; border-radius: 12px; background: #dce9f7; border: 2px solid var(--border); }
 .geo-map { width: 100%; height: auto; display: block; }
 
+/* D3-rendered state paths */
 .geo-state {
-  fill: #c8dff7; stroke: #fff; stroke-width: 1.5;
-  cursor: pointer; transition: fill 0.15s;
+  fill: #a8cce8; stroke: #fff; stroke-width: 0.5;
+  cursor: default; transition: fill 0.12s;
 }
-.geo-state:hover { fill: #a0c8f0; }
-.geo-state--highlight { fill: #f472b6; stroke: #be185d; stroke-width: 2; }
-.geo-state--correct   { fill: #4ade80; stroke: #16a34a; stroke-width: 2; }
-.geo-state--wrong     { fill: #f87171; stroke: #dc2626; stroke-width: 2; }
+.geo-state--highlight { fill: #f472b6 !important; stroke: #be185d; stroke-width: 1; }
+.geo-state--correct   { fill: #4ade80 !important; stroke: #16a34a; stroke-width: 1; }
+.geo-state--wrong     { fill: #f87171 !important; stroke: #dc2626; stroke-width: 1; }
+[style*="cursor: pointer"].geo-state:hover,
+.geo-state[style*="pointer"]:hover { fill: #7ab8e0; }
+
+/* D3 border mesh between states */
+.geo-mesh { fill: none; stroke: #fff; stroke-width: 0.8; pointer-events: none; }
+
+/* Nation outline */
+.geo-nation { fill: none; stroke: #6baed6; stroke-width: 1.2; pointer-events: none; }
 
 .geo-abbr {
-  font-size: 9px; font-weight: 700; fill: #1e3a5f;
+  font-size: 8px; font-weight: 700; fill: #1e3a5f;
   text-anchor: middle; dominant-baseline: middle;
-  font-family: system-ui, sans-serif;
-}
-.geo-inset-label {
-  font-size: 10px; fill: #666; text-anchor: middle;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, sans-serif; pointer-events: none;
 }
 
 .geo-hint { min-height: 28px; text-align: center; font-size: 0.95rem; font-weight: 600;
-            margin-top: 8px; color: var(--text); }
+            margin-top: 8px; color: var(--text); padding: 0 8px; }
 
 .choices-grid--2col { grid-template-columns: 1fr 1fr !important; }
