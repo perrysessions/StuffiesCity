@@ -44,36 +44,58 @@ async function openBag(bagKey) {
   // Roll the stuffie
   const stuffie = rollStuffie(bagKey);
 
+  // Check if already owned
+  const { data: existing } = await supabase
+    .from('user_stuffies')
+    .select('id')
+    .eq('profile_id', state.profile.id)
+    .eq('stuffie_key', stuffie.key)
+    .limit(1);
+
+  const isDuplicate = existing && existing.length > 0;
+  const refund = isDuplicate ? Math.floor(bag.cost / 2) : 0;
+
+  if (isDuplicate) {
+    state.profile.coins += refund;
+    updateCoinDisplay(state.profile.coins);
+  }
+
   // Show opening animation
   showModal(`
     <div class="bag-opening">
       <div class="bag-shake" id="bag-shaking">${bag.emoji}</div>
       <div class="bag-reveal hidden" id="bag-reveal">
         ${stuffieCard(stuffie, 'large')}
-        <div class="reveal-title">You got a ${stuffie.rarity.toUpperCase()}!</div>
-        <button class="btn btn-primary" onclick="confirmStuffie()">Add to Collection! 🎉</button>
+        ${isDuplicate
+          ? `<div class="reveal-title">You already have this one! 😅</div>
+             <div class="reveal-refund">Got 🪙 ${refund} coins back</div>`
+          : `<div class="reveal-title">You got a ${stuffie.rarity.toUpperCase()}!</div>`
+        }
+        <button class="btn btn-primary" onclick="confirmStuffie()">
+          ${isDuplicate ? 'OK!' : 'Add to Collection! 🎉'}
+        </button>
       </div>
     </div>
   `);
 
-  // Shake → reveal after 1.2s
   setTimeout(() => {
     document.getElementById('bag-shaking')?.classList.add('hidden');
     document.getElementById('bag-reveal')?.classList.remove('hidden');
   }, 1400);
 
-  // Save to Supabase (coins + new stuffie)
-  const [coinsRes, stuffieRes] = await Promise.all([
+  // Save coins; only insert stuffie if not a duplicate
+  const ops = [
     supabase.from('profiles').update({ coins: state.profile.coins }).eq('id', state.profile.id),
-    supabase.from('user_stuffies').insert({
+  ];
+  if (!isDuplicate) {
+    ops.push(supabase.from('user_stuffies').insert({
       profile_id: state.profile.id,
       stuffie_key: stuffie.key,
       rarity: stuffie.rarity,
-    }),
-  ]);
-  if (coinsRes.error || stuffieRes.error) {
-    toast('Something went wrong saving your stuffie!', 'error');
+    }));
   }
+  const results = await Promise.all(ops);
+  if (results.some(r => r.error)) toast('Something went wrong saving!', 'error');
 
   window.confirmStuffie = () => {
     closeModal();
