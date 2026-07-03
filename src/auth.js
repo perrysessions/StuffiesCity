@@ -60,7 +60,7 @@ export function renderProfilePicker() {
   hideChrome();
   setView(`
     <div class="auth-screen">
-      <div class="auth-logo">🏡 Stuffie City</div>
+      <div class="auth-logo">🐻 <span class="auth-logo-text">Stuffie City</span></div>
       <h3 style="text-align:center;margin-bottom:24px;color:var(--purple)">Who's playing?</h3>
       <div class="profile-picker-grid">
         ${state.profiles.map(p => `
@@ -93,7 +93,7 @@ export function renderProfilePicker() {
 export function renderAddProfile(isFirst) {
   setView(`
     <div class="auth-screen">
-      <div class="auth-logo">🏡 Stuffie City</div>
+      <div class="auth-logo">🐻 <span class="auth-logo-text">Stuffie City</span></div>
       <h3 style="text-align:center;margin-bottom:16px;color:var(--purple)">
         ${isFirst ? 'Create your first profile!' : 'Add a new profile!'}
       </h3>
@@ -149,7 +149,7 @@ export function renderLogin() {
   hideChrome();
   setView(`
     <div class="auth-screen">
-      <div class="auth-logo">🏡 Stuffie City</div>
+      <div class="auth-logo">🐻 <span class="auth-logo-text">Stuffie City</span></div>
       <div class="auth-tabs">
         <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
         <button class="tab-btn" id="tab-register" onclick="switchTab('register')">New Account</button>
