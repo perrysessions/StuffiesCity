@@ -6,7 +6,7 @@ async function boot() {
   if (!IS_CONFIGURED) {
     document.getElementById('view').innerHTML = `
       <div style="max-width:500px;margin:40px auto;font-family:system-ui;padding:20px">
-        <div style="font-size:3rem;text-align:center;margin-bottom:16px">🏡 Stuffie City</div>
+        <div style="font-size:3rem;text-align:center;margin-bottom:16px">🐻 Stuffie City</div>
         <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.1)">
           <h2 style="color:#a855f7;margin-bottom:12px">⚙️ Setup Required</h2>
           <p style="margin-bottom:16px;line-height:1.6">To use Stuffie City, connect it to a free Supabase backend:</p>
