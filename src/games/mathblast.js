@@ -625,16 +625,21 @@ class MathBlastGame {
     const j   = this.joy;
     const f   = this.fireBtn;
 
-    // Joystick base ring
-    ctx.globalAlpha = 0.22;
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth   = 2;
-    ctx.beginPath(); ctx.arc(j.bx, j.by, j.r, 0, TAU); ctx.stroke();
+    // Floating drag indicator — only shown while a drag is active
+    if (j.active) {
+      ctx.globalAlpha = 0.22;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth   = 2;
+      ctx.beginPath(); ctx.arc(j.bx, j.by, j.r, 0, TAU); ctx.stroke();
 
-    // Joystick thumb
-    ctx.globalAlpha = j.active ? 0.65 : 0.32;
-    ctx.fillStyle   = '#60a5fa';
-    ctx.beginPath(); ctx.arc(j.tx, j.ty, 26, 0, TAU); ctx.fill();
+      ctx.globalAlpha = 0.55;
+      ctx.fillStyle   = '#60a5fa';
+      const dx = j.tx - j.bx, dy = j.ty - j.by;
+      const dist = Math.hypot(dx, dy);
+      const cx = dist <= j.r ? j.tx : j.bx + dx/dist*j.r;
+      const cy = dist <= j.r ? j.ty : j.by + dy/dist*j.r;
+      ctx.beginPath(); ctx.arc(cx, cy, 26, 0, TAU); ctx.fill();
+    }
 
     // Fire button
     ctx.globalAlpha = f.active ? 0.82 : 0.32;
@@ -686,6 +691,7 @@ class MathBlastGame {
       f.active = true; f.id = t.identifier;
     } else {
       j.active = true; j.id = t.identifier;
+      j.bx = x; j.by = y;
       j.tx = x; j.ty = y;
     }
   }
@@ -694,10 +700,7 @@ class MathBlastGame {
     const { x, y } = this.canvasXY(t);
     const j = this.joy;
     if (t.identifier !== j.id) return;
-    const dx = x - j.bx, dy = y - j.by;
-    const d  = Math.hypot(dx, dy);
-    if (d <= j.r) { j.tx = x; j.ty = y; }
-    else          { j.tx = j.bx + dx/d*j.r; j.ty = j.by + dy/d*j.r; }
+    j.tx = x; j.ty = y;
   }
 
   onTouchEnd(t) {

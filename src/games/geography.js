@@ -310,6 +310,7 @@ function renderD3Map(containerId, highlightKey, mode) {
       return c && !isNaN(c[0]) ? `translate(${c})` : 'translate(-100,-100)';
     })
     .text(d => {
+      if (state.profile.grade >= 2) return '';
       const info = STATE_INFO[d.id.toString().padStart(2,'0')];
       return info ? info.key : '';
     });

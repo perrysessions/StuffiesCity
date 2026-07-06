@@ -240,6 +240,25 @@ begin
   update user_stuffies set profile_id = t.proposer_id
     where id = any(t.receiver_stuffie_ids);
 
+  -- Remove room placements for stuffies traded away (if no copies remain)
+  delete from room_placements rp
+  using (select stuffie_key from user_stuffies where id = any(t.proposer_stuffie_ids)) traded
+  where rp.stuffie_key = traded.stuffie_key
+    and rp.profile_id  = t.proposer_id
+    and not exists (
+      select 1 from user_stuffies
+      where profile_id = t.proposer_id and stuffie_key = traded.stuffie_key
+    );
+
+  delete from room_placements rp
+  using (select stuffie_key from user_stuffies where id = any(t.receiver_stuffie_ids)) traded
+  where rp.stuffie_key = traded.stuffie_key
+    and rp.profile_id  = t.receiver_id
+    and not exists (
+      select 1 from user_stuffies
+      where profile_id = t.receiver_id and stuffie_key = traded.stuffie_key
+    );
+
   -- Mark accepted
   update trade_requests
     set status = 'accepted', updated_at = now()
