@@ -45,6 +45,7 @@ export function updateCoinDisplay(coins) {
 export function setActiveNav(hash) {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     const href = btn.getAttribute('href');
-    btn.classList.toggle('active', href === hash || (hash.startsWith('#collection') && href === '#collection'));
+    const isRoom = (hash === '#room' || hash === '#home') && href === '#room';
+    btn.classList.toggle('active', href === hash || isRoom || (hash.startsWith('#collection') && href === '#collection'));
   });
 }

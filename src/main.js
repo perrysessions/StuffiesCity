@@ -30,9 +30,14 @@ async function boot() {
   await initAuth();
 
   // Lazy-load route handlers to keep boot fast
+  registerRoute('#room', async () => {
+    const { renderRoom } = await import('./room.js');
+    renderRoom();
+  });
+  // keep #home as alias so any old bookmarks still work
   registerRoute('#home', async () => {
-    const { renderHome } = await import('./home.js');
-    renderHome();
+    const { renderRoom } = await import('./room.js');
+    renderRoom();
   });
   registerRoute('#games', async () => {
     const { renderGamesMenu } = await import('./games/menu.js');

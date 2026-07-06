@@ -18,7 +18,7 @@ export function initRouter() {
 }
 
 async function route() {
-  const hash = window.location.hash || '#home';
+  const hash = window.location.hash || '#room';
 
   if (!state.user) {
     renderLogin();
@@ -45,6 +45,6 @@ async function route() {
   if (handler) {
     handler();
   } else {
-    handlers['#home']?.();
+    handlers['#room']?.();
   }
 }

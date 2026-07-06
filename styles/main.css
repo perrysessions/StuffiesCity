@@ -237,6 +237,9 @@ html, body {
 
 /* ── Stuffie card internals ── */
 .stuffie-emoji { font-size: 2.8rem; line-height: 1; }
+.stuffie-img { width: 2.8rem; height: 2.8rem; object-fit: contain; display: block; margin: 0 auto; }
+.stuffie-card--small .stuffie-img { width: 1.6rem; height: 1.6rem; }
+.stuffie-card--large .stuffie-img { width: 5rem; height: 5rem; }
 .stuffie-name  { font-size: 0.72rem; font-weight: 600; color: var(--text); margin-top: 6px; line-height: 1.2; }
 .stuffie-rarity { font-size: 0.65rem; font-weight: 600; margin-top: 3px; }
 
@@ -433,4 +436,295 @@ html, body {
 .geo-hint { min-height: 28px; text-align: center; font-size: 0.95rem; font-weight: 600;
             margin-top: 8px; color: var(--text); padding: 0 8px; }
 
+/* ── Room view ─────────────────────────────────────────────────────────────── */
+
+.room-screen {
+  position: fixed;
+  inset: var(--top-h) 0 var(--nav-h) 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Panning background */
+.room-bg-wrap {
+  flex: 1;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  cursor: grab;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.room-bg-wrap::-webkit-scrollbar { display: none; }
+.room-bg-wrap:active { cursor: grabbing; }
+
+.room-bg-img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  display: block;
+  pointer-events: none;
+  draggable: false;
+}
+
+/* Floating HUD over the room */
+.room-hud {
+  position: absolute;
+  top: 10px;
+  left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  pointer-events: none;
+}
+.room-hud-name {
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  padding: 5px 12px;
+  backdrop-filter: blur(6px);
+}
+.room-hud-coins {
+  background: rgba(0,0,0,0.45);
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  padding: 5px 12px;
+  backdrop-filter: blur(6px);
+}
+.room-color-btn {
+  margin-left: auto;
+  pointer-events: all;
+  background: rgba(0,0,0,0.45);
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+/* Dock */
+.room-dock {
+  position: relative;
+  background: var(--surface);
+  border-top: 2px solid var(--border);
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+  max-height: 52px;
+  overflow: hidden;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.room-dock.open {
+  max-height: 220px;
+}
+
+.dock-handle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.dock-handle-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.dock-label { white-space: nowrap; }
+
+.dock-tray {
+  display: flex;
+  gap: 10px;
+  padding: 4px 14px 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.dock-tray::-webkit-scrollbar { display: none; }
+.dock-tray .stuffie-card { flex-shrink: 0; }
+
+.dock-empty {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 8px 0;
+  white-space: nowrap;
+}
+
+/* Color picker overlay */
+.room-color-picker {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.room-color-picker.hidden { display: none; }
+
+.color-picker-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 220px;
+  box-shadow: var(--shadow);
+}
+.color-picker-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.color-option {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.color-option.active,
+.color-option:hover {
+  border-color: var(--purple);
+  background: #f3e8ff;
+}
+
 .choices-grid--2col { grid-template-columns: 1fr 1fr !important; }
+
+/* ── Room — stuffie placement layer ────────────────────────────────────────── */
+
+.room-canvas {
+  position: relative;
+  height: 100%;
+  display: inline-block; /* sizes to the image — NOT the viewport */
+}
+
+.room-stuffie-layer {
+  position: absolute;
+  inset: 0; /* now covers the image exactly, at any screen size */
+  pointer-events: none;
+}
+
+.room-zone-group {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  transform: translate(-50%, -100%);
+  pointer-events: all;
+}
+.room-placed-stuffie { margin: 0 -2px; }
+
+.room-placed-diag {
+  position: absolute;
+  margin: 0;
+  transform: translate(-50%, -100%);
+  pointer-events: all;
+}
+
+.room-placed-stuffie {
+  line-height: 1;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+  transition: transform 0.15s;
+  display: block;
+}
+.room-placed-stuffie:hover { transform: scale(1.2) translateY(-4px); }
+
+/* Zone snap targets shown during drag */
+.room-zone-target {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px dashed rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.12);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: zone-pulse 0.7s ease-in-out infinite alternate;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+.room-zone-target.nearest {
+  border-color: #fbbf24;
+  background: rgba(251,191,36,0.28);
+  transform: translate(-50%, -50%) scale(1.3);
+}
+@keyframes zone-pulse {
+  from { opacity: 0.55; }
+  to   { opacity: 1; }
+}
+
+/* Drag ghost — follows cursor/finger */
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 2.6rem;
+  line-height: 1;
+  transform: translate(-50%, -60%);
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4));
+  opacity: 0.88;
+}
+
+/* Placed stuffie tap menu */
+.placed-stuffie-menu {
+  position: fixed;
+  z-index: 9998;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 170px;
+}
+.psm-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.psm-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  background: var(--bg);
+  color: var(--text);
+}
+.psm-btn:hover { background: var(--border); }
+.psm-remove { color: #b91c1c; }
+
+/* Dock hint text */
+.dock-hint {
+  display: none;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  padding: 0 16px 8px;
+}

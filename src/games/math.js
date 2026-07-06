@@ -100,7 +100,7 @@ async function endMath() {
       <p>${sessionStats.correct} out of ${sessionStats.questions_answered} correct</p>
       <p class="end-coins">+${sessionStats.coins_earned} coins earned!</p>
       <div class="end-actions">
-        <button class="btn btn-primary" onclick="window.location.hash='#game/math'">Play Again</button>
+        <button class="btn btn-primary" onclick="if(window.location.hash==='#game/math'){window.dispatchEvent(new Event('hashchange'))}else{window.location.hash='#game/math'}">Play Again</button>
         <a href="#games" class="btn btn-outline">Other Games</a>
       </div>
     </div>

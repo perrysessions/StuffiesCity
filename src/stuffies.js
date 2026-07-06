@@ -55,6 +55,13 @@ export const BAGS = {
     desc: 'All rarities — even Mythic!',
     weights: { common: 5, uncommon: 10, rare: 20, epic: 30, legendary: 25, mythic: 10 },
   },
+  plush: {
+    name: 'Plush Bag',
+    emoji: '🧸',
+    cost: 100,
+    desc: 'Real stuffie art — hand-picked designs!',
+    weights: { common: 34, uncommon: 30, rare: 20, epic: 10, legendary: 5, mythic: 1 },
+  },
 };
 
 // Each stuffie has a fixed rarity — a Stripe Zebra is always Legendary, everywhere.
@@ -105,12 +112,44 @@ export const STUFFIE_ROSTER = [
   // Mythic (2)
   { key: 'unicorn',    emoji: '🦄', name: 'Star Unicorn',       rarity: 'mythic' },
   { key: 'dragon',     emoji: '🐉', name: 'Ember Dragon',       rarity: 'mythic' },
+  // Plush — custom AI art (PNG), plush:true keeps them out of regular bags
+  { key: 'plush-pig',      img: 'stuffiesimagesopt1/pig.png',      name: 'Plush Pig',      rarity: 'common',    plush: true },
+  { key: 'plush-cow',      img: 'stuffiesimagesopt1/cow.png',      name: 'Plush Cow',      rarity: 'common',    plush: true },
+  { key: 'plush-sheep',    img: 'stuffiesimagesopt1/sheep.png',    name: 'Plush Sheep',    rarity: 'common',    plush: true },
+  { key: 'plush-goat',     img: 'stuffiesimagesopt1/goat.png',     name: 'Plush Goat',     rarity: 'common',    plush: true },
+  { key: 'plush-duck',     img: 'stuffiesimagesopt1/duck.png',     name: 'Plush Duck',     rarity: 'common',    plush: true },
+  { key: 'plush-chicken',  img: 'stuffiesimagesopt1/chicken.png',  name: 'Plush Chicken',  rarity: 'common',    plush: true },
+  { key: 'plush-rooster',  img: 'stuffiesimagesopt1/rooster.png',  name: 'Plush Rooster',  rarity: 'common',    plush: true },
+  { key: 'plush-mouse',    img: 'stuffiesimagesopt1/mouse.png',    name: 'Plush Mouse',    rarity: 'common',    plush: true },
+  { key: 'plush-bluebird', img: 'stuffiesimagesopt1/bluebird.png', name: 'Plush Bluebird', rarity: 'common',    plush: true },
+  { key: 'plush-bear',     img: 'stuffiesimagesopt1/bear.png',     name: 'Plush Bear',     rarity: 'uncommon',  plush: true },
+  { key: 'plush-horse',    img: 'stuffiesimagesopt1/horse.png',    name: 'Plush Horse',    rarity: 'uncommon',  plush: true },
+  { key: 'plush-otter',    img: 'stuffiesimagesopt1/otter.png',    name: 'Plush Otter',    rarity: 'uncommon',  plush: true },
+  { key: 'plush-bunny',    img: 'stuffiesimagesopt1/bunny.png',    name: 'Plush Bunny',    rarity: 'uncommon',  plush: true },
+  { key: 'plush-cat',      img: 'stuffiesimagesopt1/cat.png',      name: 'Plush Cat',      rarity: 'uncommon',  plush: true },
+  { key: 'plush-dog',      img: 'stuffiesimagesopt1/dog.png',      name: 'Plush Dog',      rarity: 'uncommon',  plush: true },
+  { key: 'plush-frog',     img: 'stuffiesimagesopt1/frog.png',     name: 'Plush Frog',     rarity: 'uncommon',  plush: true },
+  { key: 'plush-turtle',   img: 'stuffiesimagesopt1/turtle.png',   name: 'Plush Turtle',   rarity: 'uncommon',  plush: true },
+  { key: 'plush-fox',      img: 'stuffiesimagesopt1/fox.png',      name: 'Plush Fox',      rarity: 'rare',      plush: true },
+  { key: 'plush-owl',      img: 'stuffiesimagesopt1/owl.png',      name: 'Plush Owl',      rarity: 'rare',      plush: true },
+  { key: 'plush-deer',     img: 'stuffiesimagesopt1/deer.png',     name: 'Plush Deer',     rarity: 'rare',      plush: true },
+  { key: 'plush-elephant', img: 'stuffiesimagesopt1/elephant.png', name: 'Plush Elephant', rarity: 'rare',      plush: true },
+  { key: 'plush-penguin',  img: 'stuffiesimagesopt1/penguin.png',  name: 'Plush Penguin',  rarity: 'rare',      plush: true },
+  { key: 'plush-monkey',   img: 'stuffiesimagesopt1/monkey.png',   name: 'Plush Monkey',   rarity: 'rare',      plush: true },
+  { key: 'plush-lion',     img: 'stuffiesimagesopt1/lion.png',     name: 'Plush Lion',     rarity: 'epic',      plush: true },
+  { key: 'plush-dolphin',  img: 'stuffiesimagesopt1/dolphin.png',  name: 'Plush Dolphin',  rarity: 'epic',      plush: true },
+  { key: 'plush-zebra',    img: 'stuffiesimagesopt1/zebra.png',    name: 'Plush Zebra',    rarity: 'epic',      plush: true },
+  { key: 'plush-tigger',   img: 'stuffiesimagesopt1/tigger.png',   name: 'Plush Tiger',    rarity: 'epic',      plush: true },
+  { key: 'plush-whale',    img: 'stuffiesimagesopt1/whale.png',    name: 'Plush Whale',    rarity: 'legendary', plush: true },
+  { key: 'plush-giraffe',  img: 'stuffiesimagesopt1/giraffe.png',  name: 'Plush Giraffe',  rarity: 'legendary', plush: true },
+  { key: 'plush-shark',    img: 'stuffiesimagesopt1/shark.png',    name: 'Plush Shark',    rarity: 'mythic',    plush: true },
 ];
 
 export function rollStuffie(bagKey) {
   const bag = BAGS[bagKey];
+  const isPlush = bagKey === 'plush';
   const rarity = weightedRoll(bag.weights);
-  const pool = STUFFIE_ROSTER.filter(s => s.rarity === rarity);
+  const pool = STUFFIE_ROSTER.filter(s => s.rarity === rarity && !!s.plush === isPlush);
   const animal = pool[Math.floor(Math.random() * pool.length)];
   return { ...animal };
 }
@@ -131,7 +170,9 @@ export function stuffieCard(stuffie, size = 'normal') {
   const name = stuffie.name.replace(/'/g, "\\'");
   return `
     <div class="stuffie-card ${stuffie.rarity} ${sizeClass}" onclick="stuffieTap(this,'${name}')">
-      <div class="stuffie-emoji">${stuffie.emoji}</div>
+      <div class="stuffie-emoji">${stuffie.img
+        ? `<img src="${stuffie.img}" alt="${stuffie.name}" class="stuffie-img">`
+        : stuffie.emoji}</div>
       <div class="stuffie-name">${stuffie.name}</div>
       <div class="stuffie-rarity rarity-${stuffie.rarity}">${label}</div>
     </div>

@@ -46,7 +46,11 @@ async function loadSession(user) {
 export function activateProfile(profile) {
   state.profile = profile;
   showChrome(profile);
-  window.location.hash = '#home';
+  if (window.location.hash !== '#room') {
+    window.location.hash = '#room';
+  } else {
+    window.dispatchEvent(new Event('hashchange'));
+  }
 }
 
 export async function logout() {
