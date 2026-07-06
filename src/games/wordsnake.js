@@ -71,6 +71,13 @@ class WordSnakeGame {
     this.apples   = [];
     this.correctWord = '';
 
+    // Obstacles — start empty, added every 3 correct answers, max 5
+    this.obstacles  = [];
+    this.MAX_OBS    = 5;
+    // Each obstacle blinks: visible ~3.5s, hidden ~1.8s (at 60fps)
+    this.OBS_SHOW   = 210;
+    this.OBS_HIDE   = 110;
+
     this.dpad = this.buildDpad();
     this.bindInput();
     this.nextQuestion();
@@ -87,6 +94,7 @@ class WordSnakeGame {
       this.lastStep = now;
     }
     if (this.flashFrames > 0) this.flashFrames--;
+    this.tickObstacles();
     this.draw();
     requestAnimationFrame(() => this.loop());
   }
@@ -101,15 +109,23 @@ class WordSnakeGame {
       this.nextDir = null;
     }
 
-    const head    = this.snake[0];
-    let nc = (head.c + this.dir.dc + this.COLS) % this.COLS;
-    let nr = (head.r + this.dir.dr + this.ROWS) % this.ROWS;
+    const head = this.snake[0];
+    const nc   = head.c + this.dir.dc;
+    const nr   = head.r + this.dir.dr;
 
-    // Self-collision → game over
-    if (this.snake.some(s => s.c === nc && s.r === nr)) {
-      this.endGame();
-      return;
+    // Wall collision
+    if (nc < 0 || nc >= this.COLS || nr < 0 || nr >= this.ROWS) {
+      this.endGame(); return;
     }
+
+    // Self-collision
+    if (this.snake.some(s => s.c === nc && s.r === nr)) {
+      this.endGame(); return;
+    }
+
+    // Visible obstacle collision
+    const hitObs = this.obstacles.some(o => o.visible && o.c === nc && o.r === nr);
+    if (hitObs) { this.endGame(); return; }
 
     this.snake.unshift({ c: nc, r: nr });
 
@@ -163,8 +179,39 @@ class WordSnakeGame {
   }
 
   speedUp() {
-    // Decrease interval (faster) with each correct answer, capped at 85ms
     this.interval = Math.max(85, this.interval - 10);
+    // Add a new obstacle every 3 correct answers, up to max
+    if (this.correct % 3 === 0 && this.obstacles.length < this.MAX_OBS) {
+      this.spawnObstacle();
+    }
+  }
+
+  spawnObstacle() {
+    const head     = this.snake[0];
+    const blocked  = new Set([
+      ...this.snake.map(s => `${s.c},${s.r}`),
+      ...this.apples.map(a => `${a.c},${a.r}`),
+      ...this.obstacles.map(o => `${o.c},${o.r}`),
+    ]);
+    for (let attempt = 0; attempt < 60; attempt++) {
+      const c = rand(1, this.COLS - 2);
+      const r = rand(1, this.ROWS - 2);
+      // Keep at least 4 cells away from snake head
+      if (Math.abs(c - head.c) + Math.abs(r - head.r) < 4) continue;
+      if (blocked.has(`${c},${r}`)) continue;
+      this.obstacles.push({ c, r, visible: true, timer: this.OBS_SHOW });
+      return;
+    }
+  }
+
+  tickObstacles() {
+    for (const o of this.obstacles) {
+      o.timer--;
+      if (o.timer <= 0) {
+        o.visible = !o.visible;
+        o.timer   = o.visible ? this.OBS_SHOW : this.OBS_HIDE;
+      }
+    }
   }
 
   // ── Question ────────────────────────────────────────────────────────────────
@@ -221,13 +268,15 @@ class WordSnakeGame {
   }
 
   freeCell() {
-    const snakeSet  = new Set(this.snake.map(s => `${s.c},${s.r}`));
-    const appleSet  = new Set(this.apples.map(a => `${a.c},${a.r}`));
+    const blocked = new Set([
+      ...this.snake.map(s => `${s.c},${s.r}`),
+      ...this.apples.map(a => `${a.c},${a.r}`),
+      ...this.obstacles.map(o => `${o.c},${o.r}`),
+    ]);
     for (let attempt = 0; attempt < 40; attempt++) {
       const c = rand(1, this.COLS - 2);
       const r = rand(1, this.ROWS - 2);
-      const key = `${c},${r}`;
-      if (!snakeSet.has(key) && !appleSet.has(key)) return { c, r };
+      if (!blocked.has(`${c},${r}`)) return { c, r };
     }
     return null;
   }
@@ -273,6 +322,7 @@ class WordSnakeGame {
 
     this.drawHUD();
     this.drawGrid();
+    this.drawObstacles();
     this.drawApples();
     this.drawSnake();
     this.drawDpad();
@@ -319,19 +369,61 @@ class WordSnakeGame {
 
   drawGrid() {
     const ctx = this.ctx;
+    const gx  = this.gridX, gy = this.gridY, cs = this.CELL;
+    const gw  = this.COLS * cs, gh = this.ROWS * cs;
+
+    // Inner grid lines
     ctx.strokeStyle = '#111e11';
     ctx.lineWidth   = 0.5;
-    const gx = this.gridX, gy = this.gridY, cs = this.CELL;
     for (let c = 0; c <= this.COLS; c++) {
-      ctx.beginPath();
-      ctx.moveTo(gx + c * cs, gy);
-      ctx.lineTo(gx + c * cs, gy + this.ROWS * cs);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gx + c*cs, gy); ctx.lineTo(gx + c*cs, gy + gh); ctx.stroke();
     }
     for (let r = 0; r <= this.ROWS; r++) {
+      ctx.beginPath(); ctx.moveTo(gx, gy + r*cs); ctx.lineTo(gx + gw, gy + r*cs); ctx.stroke();
+    }
+
+    // Wall border — solid bright line
+    ctx.strokeStyle = '#16a34a';
+    ctx.lineWidth   = 3;
+    ctx.strokeRect(gx + 1.5, gy + 1.5, gw - 3, gh - 3);
+
+    // Corner accents
+    ctx.fillStyle = '#4ade80';
+    const corners = [[gx, gy],[gx+gw, gy],[gx, gy+gh],[gx+gw, gy+gh]];
+    for (const [cx, cy] of corners) {
+      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, TAU); ctx.fill();
+    }
+  }
+
+  drawObstacles() {
+    const ctx = this.ctx;
+    const cs  = this.CELL;
+    const gx  = this.gridX, gy = this.gridY;
+
+    for (const o of this.obstacles) {
+      if (!o.visible) continue;
+      const x = gx + o.c * cs, y = gy + o.r * cs;
+      const pad = 2;
+
+      // Rock shape — dark brownish grey
+      ctx.fillStyle   = '#78350f';
+      ctx.strokeStyle = '#92400e';
+      ctx.lineWidth   = 1.5;
       ctx.beginPath();
-      ctx.moveTo(gx, gy + r * cs);
-      ctx.lineTo(gx + this.COLS * cs, gy + r * cs);
+      ctx.roundRect(x + pad, y + pad, cs - pad*2, cs - pad*2, 4);
+      ctx.fill();
+      ctx.stroke();
+
+      // Rock texture lines
+      ctx.strokeStyle = '#a16207';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + pad + 4, y + cs*0.4);
+      ctx.lineTo(x + cs - pad - 4, y + cs*0.4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + cs*0.35, y + pad + 3);
+      ctx.lineTo(x + cs*0.35, y + cs - pad - 3);
       ctx.stroke();
     }
   }
