@@ -60,7 +60,7 @@ class WordSnakeGame {
     this.flashColor  = '#4ade80';
 
     // Speed: interval in ms between snake steps
-    this.interval = 220;
+    this.interval = 260;
     this.lastStep = 0;
 
     // Question pool (fill-type only, current grade)
@@ -175,7 +175,7 @@ class WordSnakeGame {
   }
 
   speedUp() {
-    this.interval = Math.max(85, this.interval - 10);
+    this.interval = Math.max(120, this.interval - 6);
     // Add a new obstacle every 3 correct answers, up to max
     if (this.correct % 3 === 0 && this.obstacles.length < this.MAX_OBS) {
       this.spawnObstacle();
