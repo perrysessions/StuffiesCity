@@ -90,7 +90,7 @@ class MathBlastGame {
   }
 
   get alienMaxCount() { return this.wave < 2 ? 1 : 2; }
-  get alienSpeed()    { return 0.55 + this.wave * 0.22; }
+  get alienSpeed()    { return 0.35 + this.wave * 0.15; }
 
   // ── Loop ────────────────────────────────────────────────────────────────────
 
@@ -125,8 +125,8 @@ class MathBlastGame {
     const tlen = Math.hypot(tx, ty);
     if (tlen > 0) { tx /= tlen; ty /= tlen; }
 
-    s.vx = (s.vx + tx * 0.38) * 0.93;
-    s.vy = (s.vy + ty * 0.38) * 0.93;
+    s.vx = (s.vx + tx * 0.22) * 0.90;
+    s.vy = (s.vy + ty * 0.22) * 0.90;
     s.x += s.vx;
     s.y += s.vy;
     if (Math.hypot(s.vx, s.vy) > 0.15) s.angle = Math.atan2(s.vy, s.vx);
@@ -342,7 +342,7 @@ class MathBlastGame {
         x: positions[i].x, y: positions[i].y,
         vx: (Math.random() - 0.5) * 1.4,
         vy: (Math.random() - 0.5) * 1.4,
-        r: 38,
+        r: 30,
         rot: Math.random() * TAU,
         rotSpeed: (Math.random() - 0.5) * 0.018,
         label: String(val),
