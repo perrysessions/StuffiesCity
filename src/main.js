@@ -55,6 +55,10 @@ async function boot() {
     const { renderReading } = await import('./games/reading.js');
     renderReading();
   });
+  registerRoute('#game/wordsnake', async () => {
+    const { renderWordSnake } = await import('./games/wordsnake.js');
+    renderWordSnake();
+  });
   registerRoute('#game/mathblast', async () => {
     const { renderMathBlast } = await import('./games/mathblast.js');
     renderMathBlast();

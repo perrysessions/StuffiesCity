@@ -10,6 +10,15 @@ export function renderGamesMenu() {
       <h2>🎮 Choose a Game</h2>
       <p class="games-grade">Playing at <strong>${gradeLabel}</strong> level</p>
 
+      <a href="#game/wordsnake" class="game-card game-card--snake">
+        <div class="game-icon">🐍</div>
+        <div class="game-info">
+          <div class="game-title">Word Snake</div>
+          <div class="game-desc">Eat the right word to fill the blank!</div>
+        </div>
+        <div class="game-coins">🪙 +5/correct</div>
+      </a>
+
       <a href="#game/english" class="game-card">
         <div class="game-icon">📖</div>
         <div class="game-info">

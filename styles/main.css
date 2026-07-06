@@ -264,6 +264,9 @@ html, body {
              margin-bottom: 12px; text-decoration: none; color: var(--text);
              border: 2px solid transparent; transition: border-color 0.15s, transform 0.1s; }
 .game-card:active { transform: scale(0.98); border-color: var(--purple); }
+.game-card--snake { border-color: #4ade8044; background: linear-gradient(135deg,#052e16 0%,#14532d 100%); color: #d1fae5; }
+.game-card--snake .game-title { color: #4ade80; }
+.game-card--snake .game-desc  { color: #86efac; }
 .game-card--blast { border-color: #7dd3fc44; background: linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); color: #e2e8f0; }
 .game-card--blast .game-title { color: #7dd3fc; }
 .game-card--blast .game-desc  { color: #94a3b8; }
