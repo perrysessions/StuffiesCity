@@ -102,6 +102,8 @@ function renderOrderView(q, shuffled) {
     renderOrderView(q, shuffled);
   };
   window.submitOrder = (correct) => {
+    const btn = document.querySelector('.order-actions .btn-primary');
+    if (btn) btn.disabled = true;
     const attempt = selectedItems.map(s => s.word).join(' ');
     const isRight = attempt === correct;
     const earned = handleAnswer(isRight);
