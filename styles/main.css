@@ -376,6 +376,8 @@ html, body {
 #switch-btn { background: rgba(255,255,255,0.22); border: none; color: #fff;
               padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem;
               white-space: nowrap; }
+#refresh-btn { background: rgba(255,255,255,0.22); border: none; color: #fff;
+               padding: 6px 10px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
 
 /* ── Profile picker ── */
 .profile-picker-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
