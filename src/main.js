@@ -55,6 +55,14 @@ async function boot() {
     const { renderReading } = await import('./games/reading.js');
     renderReading();
   });
+  registerRoute('#game/mathblast', async () => {
+    const { renderMathBlast } = await import('./games/mathblast.js');
+    renderMathBlast();
+  });
+  registerRoute('#game/mathblast/scores', async () => {
+    const { renderMathBlastScores } = await import('./games/mathblast-scores.js');
+    renderMathBlastScores();
+  });
   registerRoute('#game/geography', async () => {
     const { renderGeography } = await import('./games/geography.js');
     renderGeography();

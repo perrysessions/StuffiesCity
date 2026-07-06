@@ -41,6 +41,21 @@ async function route() {
     return;
   }
 
+  // Dynamic pattern: #game/mathblast/scores/:grade
+  const blastScoreMatch = hash.match(/^#game\/mathblast\/scores\/(\d)$/);
+  if (blastScoreMatch) {
+    const grade = parseInt(blastScoreMatch[1]);
+    if (grade >= 1 && grade <= 5) {
+      // Temporarily override profile grade for the leaderboard view, restore after
+      const prev = state.profile.grade;
+      state.profile.grade = grade;
+      const { renderMathBlastScores } = await import('./games/mathblast-scores.js');
+      await renderMathBlastScores();
+      state.profile.grade = prev;
+    }
+    return;
+  }
+
   const handler = handlers[hash];
   if (handler) {
     handler();

@@ -264,6 +264,49 @@ html, body {
              margin-bottom: 12px; text-decoration: none; color: var(--text);
              border: 2px solid transparent; transition: border-color 0.15s, transform 0.1s; }
 .game-card:active { transform: scale(0.98); border-color: var(--purple); }
+.game-card--blast { border-color: #7dd3fc44; background: linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); color: #e2e8f0; }
+.game-card--blast .game-title { color: #7dd3fc; }
+.game-card--blast .game-desc  { color: #94a3b8; }
+.game-card--has-sub { flex-direction: column; gap: 0; padding: 0; overflow: hidden; }
+.game-card-main    { display: flex; align-items: center; gap: 16px; padding: 18px 16px; text-decoration: none; color: inherit; width: 100%; box-sizing: border-box; }
+.game-card-scores  { display: block; text-align: center; padding: 8px; font-size: 0.82rem; font-weight: 600;
+                     color: #a78bfa; background: rgba(167,139,250,0.1); text-decoration: none;
+                     border-top: 1px solid rgba(167,139,250,0.2); letter-spacing: 0.04em; }
+.game-card-scores:hover { background: rgba(167,139,250,0.2); }
+
+/* ── Math Blast Scores screen ─────────────────────────────────────────────── */
+.scores-loading  { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 1.1rem; }
+.scores-screen   { max-width: 480px; margin: 0 auto; padding: 16px; }
+.scores-screen h2 { text-align: center; margin-bottom: 14px; }
+
+.personal-best         { background: linear-gradient(135deg,#78350f,#92400e); color: #fef3c7;
+                          border-radius: var(--radius); padding: 16px 20px; margin-bottom: 18px;
+                          text-align: center; box-shadow: var(--shadow); }
+.personal-best--empty  { background: var(--surface); color: var(--text-muted); }
+.pb-label  { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+.pb-score  { font-size: 2.6rem; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.pb-detail { font-size: 0.82rem; opacity: 0.8; }
+
+.grade-tabs        { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+.grade-tab         { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border);
+                     background: var(--surface); color: var(--text); font-weight: 700; cursor: pointer;
+                     font-size: 0.95rem; transition: all 0.15s; }
+.grade-tab--active { background: var(--purple); color: #fff; border-color: var(--purple); }
+.scores-grade-label { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.score-header, .score-row { display: grid; grid-template-columns: 2rem 1fr 3.5rem 3rem;
+                              gap: 4px; align-items: center; padding: 8px 10px; }
+.score-header { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+                letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+.score-row    { background: var(--surface); border-radius: 8px; margin-bottom: 5px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.06); font-size: 0.9rem; }
+.score-row--me { background: linear-gradient(90deg,#fef3c7,#fffbeb); border: 1.5px solid #f59e0b; }
+.score-rank   { font-size: 1.1rem; text-align: center; }
+.score-name   { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.score-pts    { font-weight: 700; color: var(--purple); text-align: right; }
+.score-acc    { font-size: 0.8rem; color: var(--text-muted); text-align: right; }
+.scores-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.95rem; }
+.scores-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
 .game-icon  { font-size: 2.4rem; }
 .game-info  { flex: 1; }
 .game-title { font-weight: 700; font-size: 1.1rem; }

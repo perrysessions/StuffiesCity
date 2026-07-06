@@ -18,6 +18,7 @@ create table profiles (
   grade          int  not null check (grade between 1 and 5),
   coins          int  not null default 0,
   avatar_emoji   text not null default '🐱',
+  room_color     text not null default 'pink',
   created_at     timestamptz default now()
 );
 
@@ -42,11 +43,22 @@ create table friendships (
 create table game_sessions (
   id                 uuid primary key default gen_random_uuid(),
   profile_id         uuid not null references profiles(id) on delete cascade,
-  game_type          text not null check (game_type in ('english','math','reading')),
+  game_type          text not null check (game_type in ('english','math','reading','geography','mathblast')),
   questions_answered int  not null default 0,
   correct            int  not null default 0,
   coins_earned       int  not null default 0,
   created_at         timestamptz default now()
+);
+
+create table mathblast_scores (
+  id          uuid primary key default gen_random_uuid(),
+  profile_id  uuid not null references profiles(id) on delete cascade,
+  username    text not null,
+  grade       int  not null,
+  score       int  not null,
+  correct     int  not null default 0,
+  answered    int  not null default 0,
+  created_at  timestamptz default now()
 );
 
 -- ── 2. Enable RLS ─────────────────────────────────────────────────────────────
@@ -54,7 +66,8 @@ create table game_sessions (
 alter table profiles      enable row level security;
 alter table user_stuffies enable row level security;
 alter table friendships   enable row level security;
-alter table game_sessions enable row level security;
+alter table game_sessions      enable row level security;
+alter table mathblast_scores   enable row level security;
 
 -- ── 2b. Helper function (security definer = bypasses RLS, no recursion) ───────
 -- Returns the profile IDs belonging to the currently logged-in parent account.
@@ -137,3 +150,33 @@ create policy "sessions: family full access"
   on game_sessions for all
   using  (profile_id = any(select my_profile_ids()))
   with check (profile_id = any(select my_profile_ids()));
+
+-- ── 7. Policies: mathblast_scores ─────────────────────────────────────────────
+
+-- All logged-in users can read scores (leaderboard)
+create policy "mathblast_scores: authenticated read"
+  on mathblast_scores for select
+  using (auth.uid() is not null);
+
+-- Only own family profiles can insert
+create policy "mathblast_scores: family insert"
+  on mathblast_scores for insert
+  with check (profile_id = any(select my_profile_ids()));
+
+-- ── MIGRATION (existing installs only — skip on fresh setup) ─────────────────
+-- Run this block separately if you already have the tables set up:
+--
+-- alter table game_sessions drop constraint if exists game_sessions_game_type_check;
+-- alter table game_sessions add constraint game_sessions_game_type_check
+--   check (game_type in ('english','math','reading','geography','mathblast'));
+--
+-- create table if not exists mathblast_scores (
+--   id uuid primary key default gen_random_uuid(),
+--   profile_id uuid not null references profiles(id) on delete cascade,
+--   username text not null, grade int not null, score int not null,
+--   correct int not null default 0, answered int not null default 0,
+--   created_at timestamptz default now()
+-- );
+-- alter table mathblast_scores enable row level security;
+-- create policy "mathblast_scores: authenticated read" on mathblast_scores for select using (auth.uid() is not null);
+-- create policy "mathblast_scores: family insert" on mathblast_scores for insert with check (profile_id = any(select my_profile_ids()));

@@ -46,6 +46,18 @@ export function renderGamesMenu() {
         <div class="game-coins">🪙 +5/correct</div>
       </a>
 
+      <div class="game-card game-card--blast game-card--has-sub">
+        <a href="#game/mathblast" class="game-card-main">
+          <div class="game-icon">🚀</div>
+          <div class="game-info">
+            <div class="game-title">Math Blast</div>
+            <div class="game-desc">Shoot the right answer out of the sky!</div>
+          </div>
+          <div class="game-coins">🪙 +5/correct</div>
+        </a>
+        <a href="#game/mathblast/scores" class="game-card-scores">🏆 Scores</a>
+      </div>
+
       <div class="games-hint">Answer correctly to build a streak bonus! ⭐</div>
     </div>
   `);
