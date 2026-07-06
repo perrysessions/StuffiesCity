@@ -24,7 +24,10 @@ export function renderShop() {
 
   setView(`
     <div class="shop-screen">
-      <h2>🛍️ Blind Bag Shop</h2>
+      <div class="shop-top-row">
+        <h2>🛍️ Blind Bag Shop</h2>
+        <a href="#glossary" class="btn btn-outline btn-sm gloss-btn">📖 Glossary</a>
+      </div>
       <p class="shop-balance">You have 🪙 <strong>${coins}</strong> coins</p>
       <div class="bag-grid">${bagCards}</div>
     </div>

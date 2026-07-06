@@ -75,6 +75,10 @@ async function boot() {
     const { renderShop } = await import('./shop.js');
     renderShop();
   });
+  registerRoute('#glossary', async () => {
+    const { renderGlossary } = await import('./glossary.js');
+    renderGlossary();
+  });
   registerRoute('#collection', async () => {
     const { renderFamilyCollection } = await import('./collection.js');
     renderFamilyCollection();
