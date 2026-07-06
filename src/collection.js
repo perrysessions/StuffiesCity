@@ -2,6 +2,7 @@ import { state } from './state.js';
 import { supabase } from './supabase.js';
 import { setView } from './ui.js';
 import { stuffieCard, RARITIES, STUFFIE_ROSTER } from './stuffies.js';
+import { pendingTradesHtml } from './trades.js';
 
 const rosterMap = Object.fromEntries(STUFFIE_ROSTER.map(s => [s.key, s]));
 
@@ -24,6 +25,8 @@ export async function renderFamilyCollection() {
     byProfile[r.profile_id].push(r);
   }
 
+  const pendingHtml = await pendingTradesHtml();
+
   const columns = profiles.map(p => {
     const stuffies = (byProfile[p.id] || []).map(r => ({
       ...(rosterMap[r.stuffie_key] || { key: r.stuffie_key, emoji: '❓', name: r.stuffie_key }),
@@ -42,6 +45,7 @@ export async function renderFamilyCollection() {
           <div class="family-col-name">${p.username}</div>
           <div class="family-col-count">${stuffies.length} stuffies</div>
           <a href="#collection/${p.id}" class="btn btn-outline btn-xs">Full View</a>
+          ${p.id !== state.profile.id ? `<a href="#trade/new/${p.id}" class="btn btn-outline btn-xs btn-trade">📦 Trade</a>` : ''}
         </div>
         <div class="family-col-grid">${gridHtml}</div>
       </div>
@@ -51,6 +55,7 @@ export async function renderFamilyCollection() {
   setView(`
     <div class="family-collection-screen">
       <h2 style="text-align:center;margin-bottom:16px">🎒 Family Collection</h2>
+      ${pendingHtml}
       <div class="family-cols">${columns}</div>
     </div>
   `);
@@ -107,6 +112,7 @@ export async function renderCollection(profileId) {
         <button class="btn btn-outline btn-sm" onclick="history.back()">← Back</button>
         <h2>${profile?.avatar_emoji || '🎒'} ${profile?.username || 'Collection'}</h2>
         <div class="collection-count">${stuffies.length} stuffies</div>
+        ${!isOwn ? `<a href="#trade/new/${profileId}" class="btn btn-primary btn-sm">📦 Trade</a>` : ''}
       </div>
       ${emptyHtml}
     </div>

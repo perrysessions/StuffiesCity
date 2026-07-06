@@ -33,6 +33,22 @@ async function route() {
 
   setActiveNav(hash);
 
+  // Dynamic pattern: #trade/new/:profileId
+  const tradeNewMatch = hash.match(/^#trade\/new\/(.+)$/);
+  if (tradeNewMatch) {
+    const { renderNewTrade } = await import('./trades.js');
+    renderNewTrade(tradeNewMatch[1]);
+    return;
+  }
+
+  // Dynamic pattern: #trade/view/:tradeId
+  const tradeViewMatch = hash.match(/^#trade\/view\/(.+)$/);
+  if (tradeViewMatch) {
+    const { renderTradeView } = await import('./trades.js');
+    renderTradeView(tradeViewMatch[1]);
+    return;
+  }
+
   // Dynamic pattern: #collection/userId
   const collectionMatch = hash.match(/^#collection\/(.+)$/);
   if (collectionMatch) {

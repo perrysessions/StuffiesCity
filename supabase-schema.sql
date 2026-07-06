@@ -61,6 +61,18 @@ create table mathblast_scores (
   created_at  timestamptz default now()
 );
 
+create table trade_requests (
+  id                   uuid primary key default gen_random_uuid(),
+  proposer_id          uuid not null references profiles(id) on delete cascade,
+  receiver_id          uuid not null references profiles(id) on delete cascade,
+  proposer_stuffie_ids uuid[] not null,
+  receiver_stuffie_ids uuid[] not null,
+  status               text not null default 'pending'
+                         check (status in ('pending','accepted','declined','cancelled')),
+  created_at           timestamptz default now(),
+  updated_at           timestamptz default now()
+);
+
 -- ── 2. Enable RLS ─────────────────────────────────────────────────────────────
 
 alter table profiles      enable row level security;
@@ -68,6 +80,7 @@ alter table user_stuffies enable row level security;
 alter table friendships   enable row level security;
 alter table game_sessions      enable row level security;
 alter table mathblast_scores   enable row level security;
+alter table trade_requests     enable row level security;
 
 -- ── 2b. Helper function (security definer = bypasses RLS, no recursion) ───────
 -- Returns the profile IDs belonging to the currently logged-in parent account.
@@ -162,6 +175,89 @@ create policy "mathblast_scores: authenticated read"
 create policy "mathblast_scores: family insert"
   on mathblast_scores for insert
   with check (profile_id = any(select my_profile_ids()));
+
+-- ── 8. Policies: trade_requests ──────────────────────────────────────────────
+
+-- Proposer and receiver can read their own trades
+create policy "trades: parties can view"
+  on trade_requests for select
+  using (
+    proposer_id = any(select my_profile_ids())
+    or receiver_id = any(select my_profile_ids())
+  );
+
+-- Only proposer can create a trade
+create policy "trades: proposer can insert"
+  on trade_requests for insert
+  with check (proposer_id = any(select my_profile_ids()));
+
+-- Both parties can update status (accept/decline/cancel) — RPC enforces auth
+create policy "trades: parties can update"
+  on trade_requests for update
+  using (
+    proposer_id = any(select my_profile_ids())
+    or receiver_id = any(select my_profile_ids())
+  );
+
+-- ── 9. accept_trade RPC (atomic stuffie swap) ─────────────────────────────────
+
+create or replace function accept_trade(p_trade_id uuid)
+returns void
+language plpgsql
+security definer
+as $$
+declare
+  t trade_requests;
+begin
+  select * into t from trade_requests where id = p_trade_id and status = 'pending';
+  if not found then
+    raise exception 'Trade not found or already resolved';
+  end if;
+
+  -- Only the receiver can accept
+  if not exists (
+    select 1 from profiles where id = t.receiver_id and parent_user_id = auth.uid()
+  ) then
+    raise exception 'Not authorized to accept this trade';
+  end if;
+
+  -- Validate stuffies still belong to the right owners
+  if (select count(*) from user_stuffies
+      where id = any(t.proposer_stuffie_ids) and profile_id = t.proposer_id)
+     != cardinality(t.proposer_stuffie_ids) then
+    raise exception 'Some offered stuffies are no longer available';
+  end if;
+
+  if (select count(*) from user_stuffies
+      where id = any(t.receiver_stuffie_ids) and profile_id = t.receiver_id)
+     != cardinality(t.receiver_stuffie_ids) then
+    raise exception 'Some requested stuffies are no longer available';
+  end if;
+
+  -- Atomic swap
+  update user_stuffies set profile_id = t.receiver_id
+    where id = any(t.proposer_stuffie_ids);
+  update user_stuffies set profile_id = t.proposer_id
+    where id = any(t.receiver_stuffie_ids);
+
+  -- Mark accepted
+  update trade_requests
+    set status = 'accepted', updated_at = now()
+    where id = p_trade_id;
+
+  -- Cancel any other pending trades that involved the same stuffies
+  update trade_requests
+    set status = 'cancelled', updated_at = now()
+    where id != p_trade_id
+      and status = 'pending'
+      and (
+        proposer_stuffie_ids && t.proposer_stuffie_ids or
+        proposer_stuffie_ids && t.receiver_stuffie_ids or
+        receiver_stuffie_ids && t.proposer_stuffie_ids or
+        receiver_stuffie_ids && t.receiver_stuffie_ids
+      );
+end;
+$$;
 
 -- ── MIGRATION (existing installs only — skip on fresh setup) ─────────────────
 -- Run this block separately if you already have the tables set up:

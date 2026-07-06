@@ -774,3 +774,69 @@ html, body {
   color: var(--muted);
   padding: 0 16px 8px;
 }
+
+/* ── Trade screens ─────────────────────────────────────────────────────────── */
+.trade-loading    { text-align:center; padding:60px 20px; color:var(--text-muted); font-size:1.1rem; }
+.trade-wizard,
+.trade-view       { max-width:480px; margin:0 auto; padding:16px; }
+.trade-wiz-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.trade-step-pill  { background:var(--purple); color:#fff; font-size:0.75rem; font-weight:700;
+                    padding:3px 10px; border-radius:99px; }
+.trade-status-badge { font-size:0.85rem; font-weight:600; color:var(--text-muted); }
+.trade-heading    { font-size:1.15rem; font-weight:800; margin:0 0 4px; }
+.trade-subhead    { font-size:0.88rem; color:var(--text-muted); margin:0 0 8px; }
+.trade-sel-count  { font-size:0.8rem; color:var(--purple); font-weight:700; margin-bottom:10px; }
+.trade-empty      { text-align:center; padding:24px; color:var(--text-muted); }
+.trade-confirm-note { font-size:0.82rem; color:var(--text-muted); text-align:center;
+                      margin:14px 0; line-height:1.5; }
+.trade-actions    { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+
+/* Selectable stuffie grid */
+.trade-grid       { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+.trade-sel-card   { position:relative; background:var(--surface); border-radius:10px;
+                    border:2px solid var(--border); padding:8px 4px 6px;
+                    text-align:center; cursor:pointer; transition:border-color .15s, transform .1s; }
+.trade-sel-card:active { transform:scale(0.96); }
+.trade-sel-card--on    { border-color:var(--purple); background:#f5f0ff; }
+.trade-sel-check  { position:absolute; top:4px; right:5px; width:18px; height:18px;
+                    border-radius:50%; background:var(--purple); color:#fff;
+                    font-size:0.7rem; font-weight:700; display:flex; align-items:center;
+                    justify-content:center; opacity:0; transition:opacity .15s; }
+.trade-sel-card--on .trade-sel-check { opacity:1; }
+.trade-sel-name   { font-size:0.68rem; font-weight:600; margin-top:3px;
+                    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rarity-dot       { width:8px; height:8px; border-radius:50%; margin:3px auto 0; }
+.rarity-dot.rarity-common    { background:#aaa; }
+.rarity-dot.rarity-uncommon  { background:#4caf50; }
+.rarity-dot.rarity-rare      { background:#2196f3; }
+.rarity-dot.rarity-epic      { background:#9c27b0; }
+.rarity-dot.rarity-legendary { background:#ff9800; }
+.rarity-dot.rarity-mythic    { background:linear-gradient(135deg,#f43f5e,#a855f7,#3b82f6); }
+
+/* Review layout */
+.trade-review        { display:flex; align-items:flex-start; gap:10px; margin:16px 0;
+                       background:var(--surface); border-radius:var(--radius); padding:14px; }
+.trade-review-side   { flex:1; }
+.trade-review-label  { font-size:0.75rem; font-weight:700; text-transform:uppercase;
+                       letter-spacing:.06em; color:var(--text-muted); margin-bottom:8px; }
+.trade-review-arrow  { font-size:1.6rem; padding-top:18px; color:var(--purple); }
+.trade-review-pills  { display:flex; flex-direction:column; gap:5px; }
+.stuffie-pill        { display:inline-flex; align-items:center; gap:5px; padding:4px 10px;
+                       border-radius:99px; font-size:0.82rem; font-weight:600;
+                       background:var(--surface); border:1.5px solid var(--border); }
+.stuffie-pill.rarity-uncommon  { border-color:#4caf50; }
+.stuffie-pill.rarity-rare      { border-color:#2196f3; }
+.stuffie-pill.rarity-epic      { border-color:#9c27b0; }
+.stuffie-pill.rarity-legendary { border-color:#ff9800; }
+.stuffie-pill.rarity-mythic    { border-color:#f43f5e; }
+
+/* Pending trades section */
+.pending-trades-section { background:#fff8e1; border:1.5px solid #f59e0b; border-radius:var(--radius);
+                           padding:12px 14px; margin-bottom:16px; }
+.pending-trades-title   { font-size:0.9rem; font-weight:700; margin:0 0 10px; color:#92400e; }
+.pending-trade-row      { display:flex; align-items:center; justify-content:space-between;
+                           gap:8px; padding:7px 0; border-bottom:1px solid #fde68a; font-size:0.85rem; }
+.pending-trade-row:last-child { border-bottom:none; padding-bottom:0; }
+.pending-trade-row--in  { color:#92400e; }
+.pending-trade-label    { flex:1; line-height:1.4; }
+.btn-trade              { color:var(--purple) !important; border-color:var(--purple) !important; }
