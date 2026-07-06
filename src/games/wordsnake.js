@@ -110,13 +110,9 @@ class WordSnakeGame {
     }
 
     const head = this.snake[0];
-    const nc   = head.c + this.dir.dc;
-    const nr   = head.r + this.dir.dr;
-
-    // Wall collision
-    if (nc < 0 || nc >= this.COLS || nr < 0 || nr >= this.ROWS) {
-      this.endGame(); return;
-    }
+    // Wrap at edges
+    const nc = (head.c + this.dir.dc + this.COLS) % this.COLS;
+    const nr = (head.r + this.dir.dr + this.ROWS) % this.ROWS;
 
     // Self-collision
     if (this.snake.some(s => s.c === nc && s.r === nr)) {
@@ -382,17 +378,10 @@ class WordSnakeGame {
       ctx.beginPath(); ctx.moveTo(gx, gy + r*cs); ctx.lineTo(gx + gw, gy + r*cs); ctx.stroke();
     }
 
-    // Wall border — solid bright line
-    ctx.strokeStyle = '#16a34a';
-    ctx.lineWidth   = 3;
-    ctx.strokeRect(gx + 1.5, gy + 1.5, gw - 3, gh - 3);
-
-    // Corner accents
-    ctx.fillStyle = '#4ade80';
-    const corners = [[gx, gy],[gx+gw, gy],[gx, gy+gh],[gx+gw, gy+gh]];
-    for (const [cx, cy] of corners) {
-      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, TAU); ctx.fill();
-    }
+    // Faint boundary outline — decorative only, no wall death
+    ctx.strokeStyle = 'rgba(74,222,128,0.18)';
+    ctx.lineWidth   = 2;
+    ctx.strokeRect(gx + 1, gy + 1, gw - 2, gh - 2);
   }
 
   drawObstacles() {

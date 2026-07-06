@@ -6,7 +6,7 @@ import { ENGLISH_QUESTIONS } from './english-data.js';
 let questions = [];
 let current = 0;
 let sessionStats = { questions_answered: 0, correct: 0, coins_earned: 0 };
-let selectedWords = [];  // for 'order' type
+let selectedItems = [];  // for 'order' type — [{word, bankIdx}]
 
 export function renderEnglish() {
   const grade = state.profile.grade;
@@ -59,25 +59,26 @@ function showFill(q) {
 }
 
 function showOrder(q) {
-  selectedWords = [];
+  selectedItems = [];
   const shuffled = shuffle([...q.words]);
   renderOrderView(q, shuffled);
 }
 
 function renderOrderView(q, shuffled) {
+  const usedIndices = new Set(selectedItems.map(s => s.bankIdx));
   setView(`
     <div class="game-screen">
       ${progressBar()}
       <div class="game-question">
         <div class="question-label">📝 Put the words in order</div>
         <div class="order-answer" id="order-answer">
-          ${selectedWords.map((w,i) => `<span class="word-chip selected" onclick="removeWord(${i})">${w}</span>`).join('')}
-          ${selectedWords.length === 0 ? '<span class="order-placeholder">Tap words below ↓</span>' : ''}
+          ${selectedItems.map((s,i) => `<span class="word-chip selected" onclick="removeWord(${i})">${s.word}</span>`).join('')}
+          ${selectedItems.length === 0 ? '<span class="order-placeholder">Tap words below ↓</span>' : ''}
         </div>
       </div>
       <div class="order-bank" id="order-bank">
         ${shuffled.map((w,i) => {
-          const used = selectedWords.includes(w) && selectedWords.indexOf(w) !== -1;
+          const used = usedIndices.has(i);
           return `<span class="word-chip${used ? ' used' : ''}" onclick="addWord('${w}',${i})">${w}</span>`;
         }).join('')}
       </div>
@@ -88,20 +89,20 @@ function renderOrderView(q, shuffled) {
     </div>
   `);
 
-  window.addWord = (word) => {
-    selectedWords.push(word);
+  window.addWord = (word, bankIdx) => {
+    selectedItems.push({ word, bankIdx });
     renderOrderView(q, shuffled);
   };
   window.removeWord = (idx) => {
-    selectedWords.splice(idx, 1);
+    selectedItems.splice(idx, 1);
     renderOrderView(q, shuffled);
   };
   window.clearOrder = () => {
-    selectedWords = [];
+    selectedItems = [];
     renderOrderView(q, shuffled);
   };
   window.submitOrder = (correct) => {
-    const attempt = selectedWords.join(' ');
+    const attempt = selectedItems.map(s => s.word).join(' ');
     const isRight = attempt === correct;
     const earned = handleAnswer(isRight);
     sessionStats.questions_answered++;
