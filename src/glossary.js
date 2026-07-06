@@ -51,11 +51,11 @@ export async function renderGlossary() {
       const have = ownedKeys.has(s.key);
       const display = s.img
         ? `<img src="${s.img}" alt="${s.name}" class="gloss-card-img ${have ? '' : 'gloss-unseen-img'}">`
-        : `<span class="gloss-card-emoji ${have ? '' : 'gloss-unseen-emoji'}">${have ? s.emoji : '❓'}</span>`;
+        : `<span class="gloss-card-emoji ${have ? '' : 'gloss-unseen-emoji'}">${s.emoji}</span>`;
       return `
         <div class="gloss-card ${have ? 'gloss-card--owned' : 'gloss-card--unseen'}">
           ${display}
-          <div class="gloss-card-name">${have ? s.name : '???'}</div>
+          <div class="gloss-card-name">${s.name}</div>
           ${have ? `<div class="gloss-card-check">✓</div>` : ''}
         </div>`;
     }).join('');
