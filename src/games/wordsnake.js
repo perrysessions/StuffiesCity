@@ -32,13 +32,13 @@ class WordSnakeGame {
     this.ctx = canvas.getContext('2d');
     this.W   = canvas.width;
     this.H   = canvas.height;
-    this.HH  = 88;  // HUD height (sentence display)
-    this.PAD = 130; // d-pad area at bottom
+    this.HH  = 88; // HUD height (sentence display)
+    this.PAD = 0;  // no d-pad — swipe controls
 
-    // Grid sizing — ~18 cols, square cells
+    // Grid sizing — fewer cols = bigger cells = easier to read words
     const gameH   = this.H - this.HH - this.PAD;
-    this.COLS     = 18;
-    this.CELL     = Math.floor(Math.min(this.W / this.COLS, gameH / 16));
+    this.COLS     = 14;
+    this.CELL     = Math.floor(Math.min(this.W / this.COLS, gameH / 14));
     this.ROWS     = Math.floor(gameH / this.CELL);
     this.gridX    = Math.floor((this.W - this.COLS * this.CELL) / 2);
     this.gridY    = this.HH;
@@ -78,7 +78,7 @@ class WordSnakeGame {
     this.OBS_SHOW   = 210;
     this.OBS_HIDE   = 110;
 
-    this.dpad = this.buildDpad();
+    this.swipeHint = 90; // frames to show "swipe to move" hint
     this.bindInput();
     this.nextQuestion();
     this.loop();
@@ -325,7 +325,7 @@ class WordSnakeGame {
     this.drawObstacles();
     this.drawApples();
     this.drawSnake();
-    this.drawDpad();
+    this.drawSwipeHint();
 
     // Flash overlay
     if (this.flashFrames > 0) {
@@ -470,75 +470,68 @@ class WordSnakeGame {
     const gx  = this.gridX, gy = this.gridY;
 
     for (const a of this.apples) {
-      const x   = gx + a.c * cs + cs / 2;
-      const y   = gy + a.r * cs + cs / 2;
-      const r   = cs * 0.42;
+      const x = gx + a.c * cs + cs / 2;
+      const y = gy + a.r * cs + cs / 2;
+      const r = cs * 0.44;
 
-      // Apple circle
+      // Apple glow + body
       ctx.shadowColor = '#ef4444';
-      ctx.shadowBlur  = 8;
-      ctx.fillStyle   = '#ef4444';
+      ctx.shadowBlur  = 10;
+      ctx.fillStyle   = '#dc2626';
       ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
 
-      // Stem
+      // Lighter top highlight
       ctx.shadowBlur  = 0;
+      ctx.fillStyle   = '#f87171';
+      ctx.beginPath(); ctx.arc(x - r*0.25, y - r*0.28, r*0.42, 0, TAU); ctx.fill();
+
+      // Stem
       ctx.strokeStyle = '#86efac';
       ctx.lineWidth   = 2;
       ctx.beginPath();
-      ctx.moveTo(x, y - r);
-      ctx.quadraticCurveTo(x + 5, y - r - 6, x + 4, y - r - 10);
+      ctx.moveTo(x + 1, y - r + 1);
+      ctx.quadraticCurveTo(x + 6, y - r - 5, x + 5, y - r - 9);
       ctx.stroke();
 
-      // Word label — scale horizontally if the word is wider than the apple
-      ctx.shadowBlur   = 0;
-      ctx.fillStyle    = '#fff';
-      const fontSize   = Math.max(9, Math.min(13, Math.floor(cs * 0.45)));
-      ctx.font         = `bold ${fontSize}px system-ui`;
-      ctx.textAlign    = 'center';
-      ctx.textBaseline = 'middle';
-      const maxW = cs * 0.88;
-      const tw   = ctx.measureText(a.word).width;
-      ctx.save();
-      ctx.translate(x, y);
-      if (tw > maxW) ctx.scale(maxW / tw, 1);
-      ctx.fillText(a.word, 0, 0);
-      ctx.restore();
-    }
-    ctx.shadowBlur = 0;
-  }
-
-  drawDpad() {
-    const ctx  = this.ctx;
-    const btns = this.dpad;
-    for (const b of btns) {
-      ctx.globalAlpha = b.pressed ? 0.75 : 0.3;
-      ctx.fillStyle   = '#4ade80';
-      ctx.beginPath();
-      ctx.roundRect(b.x, b.y, b.w, b.h, 8);
-      ctx.fill();
-
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle   = '#fff';
-      ctx.font        = 'bold 18px system-ui';
+      // Word — dark pill background first so text is always readable
+      const fontSize = Math.max(11, Math.min(15, Math.floor(cs * 0.52)));
+      ctx.font        = `bold ${fontSize}px system-ui`;
       ctx.textAlign   = 'center';
-      ctx.textBaseline= 'middle';
-      ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
+      ctx.textBaseline = 'middle';
+      const tw   = ctx.measureText(a.word).width;
+      const ph   = fontSize + 4;
+      const pw   = tw + 10;
+      // Pill background
+      ctx.fillStyle = 'rgba(0,0,0,0.62)';
+      ctx.beginPath();
+      ctx.roundRect(x - pw/2, y - ph/2, pw, ph, ph/2);
+      ctx.fill();
+      // White text with subtle shadow
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur  = 3;
+      ctx.fillStyle   = '#ffffff';
+      ctx.fillText(a.word, x, y);
+      ctx.shadowBlur  = 0;
     }
-    ctx.globalAlpha = 1;
   }
 
-  // ── D-pad layout ────────────────────────────────────────────────────────────
-
-  buildDpad() {
-    const bw  = 52, bh = 46, gap = 6;
-    const cx  = 90;  // center X of dpad
-    const cy  = this.H - this.PAD / 2 + 6;
-    return [
-      { label:'▲', x: cx - bw/2,       y: cy - bh - gap,   w: bw, h: bh, dc: 0, dr:-1, pressed:false },
-      { label:'▼', x: cx - bw/2,       y: cy + gap,         w: bw, h: bh, dc: 0, dr: 1, pressed:false },
-      { label:'◀', x: cx - bw - gap,    y: cy - bh/2,        w: bw, h: bh, dc:-1, dr: 0, pressed:false },
-      { label:'▶', x: cx + gap,         y: cy - bh/2,        w: bw, h: bh, dc: 1, dr: 0, pressed:false },
-    ];
+  drawSwipeHint() {
+    if (this.swipeHint <= 0) return;
+    const ctx = this.ctx;
+    const alpha = Math.min(1, this.swipeHint / 30);
+    ctx.globalAlpha  = alpha * 0.7;
+    ctx.fillStyle    = 'rgba(0,0,0,0.5)';
+    const tx = this.W / 2, ty = this.H - 28;
+    ctx.font         = 'bold 13px system-ui';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    const label = '👆 Swipe to steer';
+    const tw    = ctx.measureText(label).width + 20;
+    ctx.beginPath(); ctx.roundRect(tx - tw/2, ty - 14, tw, 28, 14); ctx.fill();
+    ctx.fillStyle = '#d1fae5';
+    ctx.fillText(label, tx, ty);
+    ctx.globalAlpha = 1;
+    this.swipeHint--;
   }
 
   // ── Input ────────────────────────────────────────────────────────────────────
@@ -552,21 +545,16 @@ class WordSnakeGame {
     };
     window.addEventListener('keydown', this._kd);
 
+    this._swipeStart = null;
     this._ts = e => { e.preventDefault(); [...e.changedTouches].forEach(t => this.onTouchStart(t)); };
-    this._tm = e => { e.preventDefault(); [...e.changedTouches].forEach(t => this.onTouchMove(t)); };
     this._te = e => { [...e.changedTouches].forEach(t => this.onTouchEnd(t)); };
     this.c.addEventListener('touchstart', this._ts, { passive: false });
-    this.c.addEventListener('touchmove',  this._tm, { passive: false });
     this.c.addEventListener('touchend',   this._te);
-
-    // Track swipe start for swipe gesture
-    this._swipeStart = null;
   }
 
   unbindInput() {
     window.removeEventListener('keydown', this._kd);
     this.c.removeEventListener('touchstart', this._ts);
-    this.c.removeEventListener('touchmove',  this._tm);
     this.c.removeEventListener('touchend',   this._te);
   }
 
@@ -576,49 +564,22 @@ class WordSnakeGame {
   }
 
   onTouchStart(t) {
+    this.swipeHint = 0; // dismiss hint on first touch
     const { x, y } = this.canvasXY(t);
-    // Check dpad buttons
-    for (const b of this.dpad) {
-      if (x >= b.x && x <= b.x+b.w && y >= b.y && y <= b.y+b.h) {
-        b.pressed = true; b.touchId = t.identifier;
-        this.tryDir({ dc: b.dc, dr: b.dr });
-        return;
-      }
-    }
-    // Store swipe start for game area
-    if (y > this.HH && y < this.H - this.PAD) {
-      this._swipeStart = { x, y, id: t.identifier };
-    }
-  }
-
-  onTouchMove(t) {
-    const { x, y } = this.canvasXY(t);
-    // Update dpad pressed state
-    for (const b of this.dpad) {
-      if (b.touchId === t.identifier) {
-        const inside = x >= b.x && x <= b.x+b.w && y >= b.y && y <= b.y+b.h;
-        if (inside) { this.tryDir({ dc: b.dc, dr: b.dr }); }
-      }
-    }
+    this._swipeStart = { x, y, id: t.identifier };
   }
 
   onTouchEnd(t) {
-    for (const b of this.dpad) {
-      if (b.touchId === t.identifier) { b.pressed = false; b.touchId = null; }
-    }
-    // Swipe detection
-    if (this._swipeStart && this._swipeStart.id === t.identifier) {
-      const { x, y } = this.canvasXY(t);
-      const dx = x - this._swipeStart.x;
-      const dy = y - this._swipeStart.y;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) > 28) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          this.tryDir(dx > 0 ? { dc:1, dr:0 } : { dc:-1, dr:0 });
-        } else {
-          this.tryDir(dy > 0 ? { dc:0, dr:1 } : { dc:0, dr:-1 });
-        }
-      }
-      this._swipeStart = null;
+    if (!this._swipeStart || this._swipeStart.id !== t.identifier) return;
+    const { x, y } = this.canvasXY(t);
+    const dx = x - this._swipeStart.x;
+    const dy = y - this._swipeStart.y;
+    this._swipeStart = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return; // tap, ignore
+    if (Math.abs(dx) > Math.abs(dy)) {
+      this.tryDir(dx > 0 ? { dc:1, dr:0 } : { dc:-1, dr:0 });
+    } else {
+      this.tryDir(dy > 0 ? { dc:0, dr:1 } : { dc:0, dr:-1 });
     }
   }
 
