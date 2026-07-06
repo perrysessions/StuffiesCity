@@ -785,7 +785,7 @@ html, body {
 .trade-status-badge { font-size:0.85rem; font-weight:600; color:var(--text-muted); }
 .trade-heading    { font-size:1.15rem; font-weight:800; margin:0 0 4px; }
 .trade-subhead    { font-size:0.88rem; color:var(--text-muted); margin:0 0 8px; }
-.trade-sel-count  { font-size:0.8rem; color:var(--purple); font-weight:700; margin-bottom:10px; }
+.trade-sel-count  { font-size:0.8rem; color:var(--purple); font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:10px; }
 .trade-empty      { text-align:center; padding:24px; color:var(--text-muted); }
 .trade-confirm-note { font-size:0.82rem; color:var(--text-muted); text-align:center;
                       margin:14px 0; line-height:1.5; }

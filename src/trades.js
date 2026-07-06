@@ -61,7 +61,11 @@ function renderStep1() {
       </div>
       <h3 class="trade-heading">📦 Trade with ${wTarget.avatar_emoji} ${wTarget.username}</h3>
       <p class="trade-subhead">Pick up to ${MAX_EACH} stuffies you <strong>want</strong></p>
-      <div class="trade-sel-count">${wWantIds.size} / ${MAX_EACH} selected</div>
+      <div class="trade-sel-count">
+        ${wWantIds.size} / ${MAX_EACH} selected
+        <button class="btn btn-primary btn-xs" ${wWantIds.size === 0 ? 'disabled' : ''}
+          onclick="_tradeGoStep2()">Next →</button>
+      </div>
       <div class="trade-grid">${cards}</div>
       <div class="trade-actions">
         <button class="btn btn-primary" ${wWantIds.size === 0 ? 'disabled' : ''}
@@ -91,7 +95,11 @@ function renderStep2() {
       </div>
       <h3 class="trade-heading">What will you offer?</h3>
       <p class="trade-subhead">Pick up to ${MAX_EACH} stuffies from <strong>your</strong> collection</p>
-      <div class="trade-sel-count">${wOfferIds.size} / ${MAX_EACH} selected</div>
+      <div class="trade-sel-count">
+        ${wOfferIds.size} / ${MAX_EACH} selected
+        <button class="btn btn-primary btn-xs" ${wOfferIds.size === 0 ? 'disabled' : ''}
+          onclick="_tradeGoStep3()">Next →</button>
+      </div>
       <div class="trade-grid">${cards}</div>
       <div class="trade-actions">
         <button class="btn btn-primary" ${wOfferIds.size === 0 ? 'disabled' : ''}
