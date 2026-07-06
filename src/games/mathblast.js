@@ -349,6 +349,38 @@ class MathBlastGame {
       });
       if (val === q.answer) this.correctIdx = i;
     });
+
+    // Move ship to a clear spot away from all asteroids and aliens
+    const pos = this.safeSpawnPos();
+    this.ship.x  = pos.x;
+    this.ship.y  = pos.y;
+    this.ship.vx = 0;
+    this.ship.vy = 0;
+  }
+
+  safeSpawnPos() {
+    const SAFE_R = 90; // minimum clear radius around ship
+    const candidates = [
+      { x: this.W / 2,     y: (this.H + this.HH) / 2 }, // center (preferred)
+      { x: this.W / 4,     y: (this.H + this.HH) / 2 },
+      { x: this.W * 3 / 4, y: (this.H + this.HH) / 2 },
+      { x: this.W / 2,     y: this.HH + (this.H - this.HH) * 0.25 },
+      { x: this.W / 2,     y: this.HH + (this.H - this.HH) * 0.75 },
+    ];
+    // Also try 12 random positions
+    for (let i = 0; i < 12; i++) {
+      candidates.push({
+        x: rand(60, this.W - 60),
+        y: rand(this.HH + 60, this.H - 60),
+      });
+    }
+    const obstacles = [...this.asteroids, ...this.aliens];
+    for (const c of candidates) {
+      const clear = obstacles.every(o => Math.hypot(c.x - o.x, c.y - o.y) > o.r + SAFE_R);
+      if (clear) return c;
+    }
+    // Fallback: return center even if not ideal
+    return { x: this.W / 2, y: (this.H + this.HH) / 2 };
   }
 
   spreadPositions(n) {
